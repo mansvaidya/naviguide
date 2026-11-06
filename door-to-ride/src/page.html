@@ -1,0 +1,189 @@
+<title>Door to Ride</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Voice, sound and touch guidance from an apartment door to a waiting ride, for riders who can't see.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@500;700&display=swap">
+{{STYLE}}
+<a class="skip" href="#now-h">Skip to guidance</a>
+
+<header class="bar">
+  <div class="bar-in">
+    <p class="brand"><span class="brand-mark" aria-hidden="true"></span>Door to Ride</p>
+    <p class="chip" id="ride-chip" data-state="matched">Connecting…</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="now" id="now" aria-labelledby="now-h">
+    <p class="eyebrow" id="phase-label">Before you leave</p>
+    <h1 id="now-h" tabindex="-1">Ready when you are</h1>
+    <p class="now-detail" id="now-detail">Loading your ride…</p>
+
+    <div class="pointer" id="pointer" aria-hidden="true" hidden>
+      <svg viewBox="0 0 120 120" class="dial">
+        <circle cx="60" cy="60" r="54" class="dial-ring"/>
+        <g class="dial-ticks"></g>
+        <g id="pointer-arrow" class="dial-arrow"><path d="M60 14 L74 52 L60 44 L46 52 Z"/><rect x="57" y="44" width="6" height="34" rx="3"/></g>
+        <text x="60" y="104" text-anchor="middle" class="dial-12">12</text>
+      </svg>
+      <div class="pointer-read">
+        <p class="pointer-dist" id="pointer-dist">–</p>
+        <p class="pointer-where" id="pointer-where">–</p>
+      </div>
+    </div>
+
+    <button type="button" class="primary" id="primary">Start</button>
+    <div class="quick" role="group" aria-label="Quick actions">
+      <button type="button" id="btn-repeat">Repeat</button>
+      <button type="button" id="btn-where">Where's my car?</button>
+      <button type="button" id="btn-signal">Ask to honk</button>
+    </div>
+
+    <div class="ask">
+      <button type="button" class="talk" id="talk" aria-describedby="talk-hint">
+        <span class="talk-dot" aria-hidden="true"></span><span id="talk-label">Talk</span>
+      </button>
+      <form class="ask-form" id="ask-form" autocomplete="off">
+        <label for="ask-input" class="sr-only">Type a request</label>
+        <input id="ask-input" name="ask" type="text" placeholder="Type a request, e.g. how far" enterkeyhint="send">
+        <button type="submit">Send</button>
+      </form>
+      <p class="hint" id="talk-hint">Say or type: where is my car · how far · is it here · describe the car · speak slower · help</p>
+    </div>
+  </section>
+
+  <section class="card ride" aria-labelledby="ride-h">
+    <h2 id="ride-h">Your ride</h2>
+    <dl class="facts" id="ride-facts"></dl>
+    <div class="row" role="group" aria-label="Ride actions">
+      <button type="button" id="btn-message">Tell driver I'm coming</button>
+      <button type="button" id="btn-describe">Describe the car</button>
+      <label class="file-btn" id="photo-wrap" for="photo-input">Check car with a photo
+        <input id="photo-input" type="file" accept="image/*" capture="environment" class="sr-only">
+      </label>
+    </div>
+    <ol class="messages" id="messages" aria-label="Messages with your driver"></ol>
+  </section>
+
+  <section class="card" aria-labelledby="route-h">
+    <h2 id="route-h">Route to the curb</h2>
+    <ol class="route" id="route-list"></ol>
+  </section>
+
+  <details class="card fold" id="practice" open>
+    <summary><h2>Practice walk</h2><span class="sum-note">Simulated street, for demos and co-design</span></summary>
+    <div class="practice-body">
+      <div class="map-wrap">
+        <canvas id="map" width="640" height="420" aria-hidden="true"></canvas>
+        <p class="map-key" aria-hidden="true"><span class="k k-me"></span>Nadia <span class="k k-car"></span>Car <span class="k k-pin"></span>Pickup pin <span class="k k-haz"></span>Hazard</p>
+      </div>
+      <div class="sim-pad" role="group" aria-label="Move the practice walker">
+        <button type="button" data-sim="turn:-30">Turn left</button>
+        <button type="button" data-sim="walk:3">3 steps forward</button>
+        <button type="button" data-sim="turn:30">Turn right</button>
+        <button type="button" data-sim="walk:-1">1 step back</button>
+        <button type="button" data-sim="walk:1">1 step forward</button>
+        <button type="button" data-sim="turn:180">Turn around</button>
+      </div>
+      <p class="hint">With focus on these buttons, arrow keys also walk and turn.</p>
+      <div class="row">
+        <button type="button" id="sim-arrive">Car pulls up now</button>
+        <button type="button" id="sim-restart">Restart journey</button>
+        <label class="inline" for="sim-speed">Ride clock
+          <select id="sim-speed">
+            <option value="1">Real time</option>
+            <option value="4" selected>4× faster</option>
+            <option value="12">12× faster</option>
+          </select>
+        </label>
+      </div>
+      <p class="note" id="voice-note"></p>
+    </div>
+  </details>
+
+  <details class="card fold" id="settings">
+    <summary><h2>Settings</h2><span class="sum-note">Saved to Nadia's toolkit profile</span></summary>
+    <form class="settings" id="settings-form" autocomplete="off">
+      <fieldset>
+        <legend>Hearing the app</legend>
+        <label class="check"><input type="checkbox" id="set-sr"> I use a screen reader (VoiceOver, TalkBack)</label>
+        <p class="note">On: the app's words go to your screen reader. Off: the app speaks them in its own voice.</p>
+        <label for="set-rate">Speaking speed <output id="set-rate-out" for="set-rate">1.0×</output></label>
+        <input type="range" id="set-rate" min="0.5" max="2" step="0.1" value="1">
+      </fieldset>
+      <fieldset>
+        <legend>Directions</legend>
+        <label class="check"><input type="radio" name="dir" id="set-clock" value="clock"> Clock positions ("at 2 o'clock")</label>
+        <label class="check"><input type="radio" name="dir" id="set-plain" value="plain"> Left and right ("slightly to your right")</label>
+        <label class="check"><input type="radio" name="unit" id="set-steps" value="steps"> Distances in my steps</label>
+        <label class="check"><input type="radio" name="unit" id="set-feet" value="feet"> Distances in feet</label>
+        <label for="set-step">My step length, in meters</label>
+        <input type="number" id="set-step" min="0.4" max="1.2" step="0.05" value="0.7" inputmode="decimal">
+      </fieldset>
+      <fieldset>
+        <legend>Sound and touch</legend>
+        <label class="check"><input type="checkbox" id="set-beacon"> A sound that leads me to my car</label>
+        <label for="set-vol">Tone volume</label>
+        <input type="range" id="set-vol" min="0.03" max="0.6" step="0.01" value="0.16">
+        <label class="check"><input type="checkbox" id="set-haptics"> Phone buzzes when I face my car</label>
+        <p class="note" id="haptics-note"></p>
+      </fieldset>
+      <fieldset>
+        <legend>Ride</legend>
+        <label class="check"><input type="radio" name="ride" id="set-lyft" value="driver"> Lyft, with a driver</label>
+        <label class="check"><input type="radio" name="ride" id="set-av" value="autonomous"> Autonomous car, no driver</label>
+      </fieldset>
+      <fieldset>
+        <legend>Location</legend>
+        <p class="note" id="loc-note">Using the practice walk.</p>
+        <button type="button" id="btn-real">Use my real location and compass</button>
+      </fieldset>
+      <fieldset>
+        <legend>My route to the curb</legend>
+        <p class="note">One step per line: what to do | what you'll feel or hear | seconds. Someone who walked the route with you can write it.</p>
+        <label for="set-route" class="sr-only">Route steps</label>
+        <textarea id="set-route" rows="7" spellcheck="false"></textarea>
+        <div class="row">
+          <button type="button" id="btn-route-save">Save route</button>
+          <button type="button" id="btn-route-reset">Use example route</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Photo check (optional)</legend>
+        <p class="note">A toolkit service lets the photo check use the toolkit's image description. Leave empty to skip.</p>
+        <label for="set-svc-url">Toolkit address</label>
+        <input type="url" id="set-svc-url" placeholder="https://your-toolkit.example">
+        <label for="set-svc-token">Toolkit token</label>
+        <input type="password" id="set-svc-token" placeholder="aat_…">
+      </fieldset>
+      <div class="row">
+        <button type="button" id="btn-reset">Reset profile to Nadia's</button>
+      </div>
+    </form>
+  </details>
+
+  <details class="card fold" id="toolkit">
+    <summary><h2>How the toolkit shapes this</h2><span class="sum-note">For the research team</span></summary>
+    <div class="tk">
+      <p id="tk-presentation"></p>
+      <h3>Guidance this profile produces</h3>
+      <pre id="tk-prefs" tabindex="0"></pre>
+      <h3>Nadia's AbilityModel</h3>
+      <pre id="tk-model" tabindex="0"></pre>
+      <h3>Needs this app registered</h3>
+      <ul id="tk-needs"></ul>
+    </div>
+  </details>
+
+  <section class="card" aria-labelledby="log-h">
+    <h2 id="log-h">What the app said</h2>
+    <ol class="log" id="log" reversed tabindex="0" aria-label="Everything the app said, newest first"></ol>
+  </section>
+
+  <p class="foot">A research prototype built on the AI for Accessibility Toolkit (pre-alpha). It has not been tested with blind riders and does not replace a cane, a guide dog or orientation and mobility training. The ride and the street are simulated.</p>
+</main>
+
+<div class="sr-only" aria-live="polite" id="live-polite"></div>
+<div class="sr-only" aria-live="assertive" id="live-assert"></div>
+{{SCRIPT}}
